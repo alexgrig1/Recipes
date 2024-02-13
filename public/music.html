@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bootstrap Taskbar Page</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- Taskbar (Navbar) -->
+    <!-- Taskbar (Navbar) -->
+    <nav class="navbar navbar-expand-lg custom-navbar">
+        <a class="navbar-brand" href="/">Navbar</a>
+
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup"
+            aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+            <div class="navbar-nav ml-auto">
+                <a class="nav-item nav-link active" href="/">Home <span class="sr-only">(current)</span></a>
+                <a class="nav-item nav-link" href="/features">Features</a>
+                <a class="nav-item nav-link" href="/music">Music</a>
+                <a class="nav-item nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
+            </div>
+        </div>
+    </nav>
+
+
+
+    <!-- Page Content -->
+
+    <div class="container">
+        <div class="row justify-content-left">
+            <div class="col-md-6">
+                <div class="upload-form-box">
+                    <h1>Hello user</h1>
+                    <p>Here you can upload your music</p>
+                    <form id="styledUploadForm" action="/upload" method="post" enctype="multipart/form-data">
+                        <div class="custom-file-uploader form-group">
+                            <input type="file" id="fileInput" name="excelFile" accept=".xlsx, .xls" hidden />
+                            <label for="fileInput" class="btn btn-custom-file">Choose File</label>
+                            <span id="fileChosen">No file chosen</span>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Upload</button>
+                    </form>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="upload-text-box">
+
+                    <h1>Karaoke</h1>
+                    <p>In this page you can add your music (integrated with Spotify) via the data base and to be
+                        implemented
+                        this is for the purpose of creating Karaoke sounds finding a file locally or from spotify and
+                        filtering
+                        the voice.
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="row justify-content-end">
+
+
+        </div>
+    </div>
+
+    <!-- Bootstrap JS, Popper.js, and jQuery -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script>
+        // Listen for the submit event on the form
+        document.getElementById('styledUploadForm').addEventListener('submit', function (event) {
+            // Prevent the default form submission
+            event.preventDefault();
+
+            // Create a FormData object, passing the form as a parameter
+            var formData = new FormData(this);
+
+            // Use fetch API to send the form data to the server
+            fetch('/upload', {
+                method: 'POST',
+                body: formData,
+            })
+                .then(response => response.text())
+                .then(text => {
+                    // Save the response text in sessionStorage before reloading
+                    sessionStorage.setItem('lastServerResponse', text);
+
+                    // Reload the page
+                    window.location.reload();
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    // Save the error in sessionStorage before reloading
+                    sessionStorage.setItem('lastServerError', error.toString());
+                    window.location.reload();
+                });
+
+            // After the page reloads, check for stored messages and log them
+            document.addEventListener('DOMContentLoaded', (event) => {
+                const lastServerResponse = sessionStorage.getItem('lastServerResponse');
+                const lastServerError = sessionStorage.getItem('lastServerError');
+
+                if (lastServerResponse) {
+                    console.log('Server responded before reload:', lastServerResponse);
+                    sessionStorage.removeItem('lastServerResponse'); // Clear the stored response
+                }
+
+                if (lastServerError) {
+                    console.error('Server error before reload:', lastServerError);
+                    sessionStorage.removeItem('lastServerError'); // Clear the stored error
+                }
+            });
+        });
+    </script>
+    <script>
+        document.getElementById('fileInput').addEventListener('change', function () {
+            var fileInput = document.getElementById('fileInput');
+            var fileChosen = document.getElementById('fileChosen');
+            fileChosen.textContent = fileInput.files.length > 0 ? fileInput.files[0].name : 'No file chosen';
+        });
+    </script>
+
+</body>
+
+</html>
